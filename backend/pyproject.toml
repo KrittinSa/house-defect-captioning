@@ -1,0 +1,25 @@
+[project]
+name = "house-defect-api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.128.6",
+    "fpdf2>=2.8.5",
+    "pillow>=12.1.0",
+    "pythainlp>=5.2.0",
+    "python-dotenv>=1.2.1",
+    "python-multipart>=0.0.22",
+    "sqlmodel>=0.0.32",
+    "torch>=2.10.0",
+    "torchvision>=0.25.0",
+    "transformers>=5.1.0",
+    "uvicorn>=0.40.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.0.2",
+]

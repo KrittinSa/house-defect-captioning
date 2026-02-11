@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Summary: House Defect Captioning</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Inter', -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--primary-color);
+            background-color: var(--light-bg);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--white);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--light-bg);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            border-left: 5px solid var(--accent-color);
+            padding-left: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-card {
+            background: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #eee;
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--light-bg);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #fcfcfc;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-warning {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .badge-danger {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .metric-value {
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            font-size: 0.85rem;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Project Summary: House Defect Captioning</h1>
+            <p></p>
+        </header>
+
+        <section>
+            <h2>📊 Dataset Overview</h2>
+            <p>ข้อมูลภาพที่ใช้ในการสอน (Training) และทดสอบ (Testing) แบ่งตามประเภท Defect:</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Train</h3>
+                    <div class="value">666</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Val</h3>
+                    <div class="value">77</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Test</h3>
+                    <div class="value">97</div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Defect Type</th>
+                        <th>Train Count</th>
+                        <th>Val Count</th>
+                        <th>Test Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ขัดแต่งผนังและเก็บสีให้เรียบร้อย</td>
+                        <td>51</td>
+                        <td>6</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>ขัดแต่งฝ้าและเก็บสีให้เรียบร้อย</td>
+                        <td>36</td>
+                        <td>4</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td>จับเซี้ยมรอบช่องเปิดพร้อมเก็บสีให้เรียบร้อย</td>
+                        <td>16</td>
+                        <td>2</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>ติดตั้งนอตยึดบานพับให้เรียบร้อย</td>
+                        <td>19</td>
+                        <td>2</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>ทำความสะอาดถังบำบัดน้ำเสีย</td>
+                        <td>25</td>
+                        <td>3</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>ทำความสะอาดลูกบิด</td>
+                        <td>20</td>
+                        <td>2</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>ทำความสะอาดแอร์ให้เรียบร้อย</td>
+                        <td>14</td>
+                        <td>1</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>เก็บยาแนวกระเบื้องให้เรียบร้อย</td>
+                        <td>46</td>
+                        <td>5</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>เก็บสีสันบานให้เรียบร้อย</td>
+                        <td>24</td>
+                        <td>3</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>เก็บสีเฟรมอะลูมิเนียมให้เรียบร้อย</td>
+                        <td>62</td>
+                        <td>7</td>
+                        <td>9</td>
+                    </tr>
+                    <tr>
+                        <td>เก็บสีโครงเหล็กให้เรียบร้อย</td>
+                        <td>44</td>
+                        <td>5</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>เปลี่ยนนอตยึดบานพับพร้อมติดตั้งให้เรียบร้อย</td>
+                        <td>49</td>
+                        <td>6</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>แก้ไขกระเบื้องพื้นร่อน</td>
+                        <td>40</td>
+                        <td>5</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>แก้ไขปลั๊กสวิตช์เอียง</td>
+                        <td>46</td>
+                        <td>5</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>แก้ไขพื้นลามิเนตยวบ</td>
+                        <td>96</td>
+                        <td>12</td>
+                        <td>12</td>
+                    </tr>
+                    <tr>
+                        <td>แก้ไขรอยแตกร้าวและเก็บสีให้เรียบร้อย</td>
+                        <td>78</td>
+                        <td>9</td>
+                        <td>11</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>🤖 Model Architecture</h2>
+            <ul>
+                <li><strong>Base Model:</strong> ViT-GPT2 (Vision Encoder Decoder)</li>
+                <li><strong>Encoder:</strong> Google ViT-base-patch16-224-in21k</li>
+                <li><strong>Decoder:</strong> GPT2 (Custom Thai Tokenizer)</li>
+                <li><strong>Tokenizer:</strong> ThaiTokenizerV2 (PyThaiNLP Engine)</li>
+                <li><strong>Training Epochs:</strong> 20 (Best checkpoint used: outputs_v2/final_model)</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>🧠 Training Architecture & Flow</h2>
+            <p>รายละเอียดการเทรนโมเดลและการจัดการ Layers:</p>
+
+            <h3 style="margin-top:1.5rem;">📐 Architecture Diagram</h3>
+            <div
+                style="background:#f8f9fa; padding:1rem; border-radius:8px; font-family:monospace; font-size:0.75rem; overflow-x:auto;">
+                <pre style="margin:0;">
+                           ┌─────────────────┐
+                           │ TRAINING INPUT  │
+                           ├─────────────────┤
+   INPUT (Image)           │ Caption (Thai)  │                               OUTPUT
+     │                     │ "เก็บสีโครง..."  │                                 ▲
+     ▼                     └────────┬────────┘                                 │
+┌─────────┐                         │ (Teacher Forcing)               ┌────────────────┐
+│  Image  │                         │                                 │  Predicted     │
+│ 224×224 │                         ▼                                 │  Caption       │
+└────┬────┘                  ┌──────────────┐                         │ "เก็บสีโครง..." │
+     │                       │  Tokenizer   │                         └───────▲────────┘
+     ▼                       │(ThaiTokenizer│                                 │
+┌────────────────────────────┴──────────────┴─────────────────────────────────┴───────┐
+│                         VisionEncoderDecoderModel                                   │
+├─────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                     │
+│  ┌─────────────────────────┐          Cross-Attn         ┌───────────────────────┐ │
+│  │     ENCODER (ViT)       │ ─────────────────────────►  │   DECODER (GPT2)      │ │
+│  ├─────────────────────────┤                             ├───────────────────────┤ │
+│  │ Input: Image (3×224×224)│                             │ Input: Token IDs      │ │
+│  │        ↓                │                             │ (Caption shifted)     │ │
+│  │ Patch Embed: 16×16      │        ┌─────────┐          │        ↓              │ │
+│  │        ↓                │        │ Encoder │          │ Token Embedding       │ │
+│  │ 12 Transformer Blocks   │ ──────►│ Hidden  │─────────►│        ↓              │ │
+│  │        ↓                │        │ States  │          │ 12 Blocks + Cross-Attn│ │
+│  │ Output: 197×768         │        │(197×768)│          │        ↓              │ │
+│  │ (196 patches + 1 CLS)   │        └─────────┘          │ LM Head               │ │
+│  │                         │                             │        ↓              │ │
+│  └─────────────────────────┘                             │ Output: Vocab Logits  │ │
+│                                                          └───────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+  📝 Training: Decoder receives Caption (shifted right) as input → Predicts next token
+  🔮 Inference: Decoder generates autoregressively from &lt;BOS&gt; token
+                </pre>
+            </div>
+
+            <h3 style="margin-top:1.5rem;">� Input/Output Dimensions</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Parameter</th>
+                        <th>ค่า</th>
+                        <th>คำอธิบาย</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="2"><strong>Image (Encoder)</strong></td>
+                        <td>Input Shape</td>
+                        <td><code>(batch, 3, 224, 224)</code></td>
+                        <td>RGB Image 224×224 pixels</td>
+                    </tr>
+                    <tr>
+                        <td>Output Shape</td>
+                        <td><code>(batch, 197, 768)</code></td>
+                        <td>196 patches + 1 CLS token × 768 hidden</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4"><strong>Caption (Decoder)</strong></td>
+                        <td>Vocab Size</td>
+                        <td><code>51 tokens</code></td>
+                        <td>4 Special + 47 Thai Words</td>
+                    </tr>
+                    <tr>
+                        <td>Max Length</td>
+                        <td><code>32 tokens</code></td>
+                        <td>ความยาวสูงสุดของ Caption</td>
+                    </tr>
+                    <tr>
+                        <td>Input Shape</td>
+                        <td><code>(batch, 32)</code></td>
+                        <td>Token IDs (padded)</td>
+                    </tr>
+                    <tr>
+                        <td>Embedding Output</td>
+                        <td><code>(batch, 32, 768)</code></td>
+                        <td>หลังผ่าน Token Embedding Layer</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top:1.5rem;">�🔓 Layer Freezing Status</h3>
+            <p><strong style="color:#27ae60;">Full Fine-tuning</strong></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Layers</th>
+                        <th>Trainable?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ViT Encoder</td>
+                        <td>Patch Embedding, 12 Transformer Blocks, Pooler</td>
+                        <td><span class="badge badge-success">✅ Full</span></td>
+                    </tr>
+                    <tr>
+                        <td>GPT2 Decoder</td>
+                        <td>Token Embedding, 12 Transformer Blocks, LM Head</td>
+                        <td><span class="badge badge-success">✅ Full</span></td>
+                    </tr>
+                    <tr>
+                        <td>Cross-Attention</td>
+                        <td>เพิ่มใน GPT2 เพื่อเชื่อมกับ Encoder</td>
+                        <td><span class="badge badge-success">✅ Full</span></td>
+                    </tr>
+                    <tr>
+                        <td>Resized Embeddings</td>
+                        <td>Token Embeddings (50257 → ~1000+ Thai Vocab)</td>
+                        <td><span class="badge badge-warning">🆕 Random Init</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!--<h3 style="margin-top:1.5rem;">📊 Training Flow</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Step</th>
+                        <th>Action</th>
+                        <th>รายละเอียด</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Load Tokenizer</td>
+                        <td>ใช้ ThaiTokenizerV2 (PyThaiNLP) สำหรับตัดคำไทย</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Load Processor</td>
+                        <td>ใช้ ViTImageProcessor สำหรับ resize/normalize รูปภาพ</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Build Vocab</td>
+                        <td>สร้าง Vocabulary จาก Training Captions</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Create Model</td>
+                        <td>สร้าง VisionEncoderDecoderModel (ViT + GPT2 + Cross-Attention)</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Resize Embeddings</td>
+                        <td>ปรับขนาด Token Embeddings ให้ตรงกับ Thai Vocab</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Train</td>
+                        <td>20 Epochs, Eval ทุก Epoch, บันทึก Best Model (WER)</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Save</td>
+                        <td>บันทึก Model, Tokenizer, Processor ที่ outputs_v2/final_model</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>-->
+
+            <!--<section>
+            <h2>💡 Recommendations for Future Training</h2>
+            <p>คำแนะนำสำหรับการปรับปรุงการเทรนในอนาคต:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Technique</th>
+                        <th>Description</th>
+                        <th>Expected Benefit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Freeze Encoder (Partial)</strong></td>
+                        <td>Freeze Layers 0-5 ของ ViT Encoder</td>
+                        <td>⬇️ Memory, ⬇️ Overfitting</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Differential Learning Rate</strong></td>
+                        <td>Encoder LR: 1e-5, Decoder LR: 5e-5</td>
+                        <td>⬆️ Accuracy, ⬇️ Catastrophic Forgetting</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Warmup + Scheduler</strong></td>
+                        <td>warmup_ratio=0.1, lr_scheduler="cosine"</td>
+                        <td>⬆️ Training Stability</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Label Smoothing</strong></td>
+                        <td>label_smoothing_factor=0.1</td>
+                        <td>⬆️ Generalization</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gradient Accumulation</strong></td>
+                        <td>gradient_accumulation_steps=4</td>
+                        <td>⬆️ Effective Batch Size</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mixed Precision (FP16)</strong></td>
+                        <td>fp16=True</td>
+                        <td>⬆️ Speed 2x, ⬇️ Memory</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>-->
+
+            <section>
+                <h2>📈 Training Progress</h2>
+                <p>กราฟแสดงความก้าวหน้าในการเทรนโมเดล (Loss และ Error Rates):</p>
+                <div class="chart-container">
+                    <img src="training_graphs.png" alt="Training and Validation Progress">
+                </div>
+            </section>
+
+            <section>
+                <h2>📈 Evaluation Results (Global)</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>BLEU Score</h3>
+                        <div class="value">0.801</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>METEOR</h3>
+                        <div class="value">0.877</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Exact Accuracy</h3>
+                        <div class="value">77.3%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>WER (Word Error)</h3>
+                        <div class="value">0.226</div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>🔍 Per-Defect Performance</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Defect Type</th>
+                            <th>Samples</th>
+                            <th>Accuracy</th>
+                            <th>BLEU</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>เก็บสีเฟรมอะลูมิเนียมให้เรียบร้อย</td>
+                            <td>9</td>
+                            <td class="metric-value">1.00</td>
+                            <td class="metric-value">1.00</td>
+                            <td><span class="badge badge-success">Perfect</span></td>
+                        </tr>
+                        <tr>
+                            <td>แก้ไขปลั๊กสวิตช์เอียง</td>
+                            <td>7</td>
+                            <td class="metric-value">1.00</td>
+                            <td class="metric-value">1.00</td>
+                            <td><span class="badge badge-success">Perfect</span></td>
+                        </tr>
+                        <tr>
+                            <td>แก้ไขพื้นลามิเนตยวบ</td>
+                            <td>12</td>
+                            <td class="metric-value">1.00</td>
+                            <td class="metric-value">1.00</td>
+                            <td><span class="badge badge-success">Perfect</span></td>
+                        </tr>
+                        <tr>
+                            <td>ทำความสะอาดถังบำบัดน้ำเสีย</td>
+                            <td>4</td>
+                            <td class="metric-value">1.00</td>
+                            <td class="metric-value">1.00</td>
+                            <td><span class="badge badge-success">Perfect</span></td>
+                        </tr>
+                        <tr>
+                            <td>ทำความสะอาดแอร์ให้เรียบร้อย</td>
+                            <td>3</td>
+                            <td class="metric-value">1.00</td>
+                            <td class="metric-value">1.00</td>
+                            <td><span class="badge badge-success">Perfect</span></td>
+                        </tr>
+                        <tr>
+                            <td>ทำความสะอาดลูกบิด</td>
+                            <td>4</td>
+                            <td class="metric-value">1.00</td>
+                            <td class="metric-value">0.00</td>
+                            <td><span class="badge badge-success">Perfect</span></td>
+                        </tr>
+                        <tr>
+                            <td>จับเซี้ยมรอบช่องเปิดพร้อมเก็บสีให้เรียบร้อย</td>
+                            <td>2</td>
+                            <td class="metric-value">1.00</td>
+                            <td class="metric-value">1.00</td>
+                            <td><span class="badge badge-success">Perfect</span></td>
+                        </tr>
+                        <tr>
+                            <td>เก็บสีโครงเหล็กให้เรียบร้อย</td>
+                            <td>7</td>
+                            <td class="metric-value">0.86</td>
+                            <td class="metric-value">0.81</td>
+                            <td><span class="badge badge-success">Good</span></td>
+                        </tr>
+                        <tr>
+                            <td>แก้ไขกระเบื้องพื้นร่อน</td>
+                            <td>5</td>
+                            <td class="metric-value">0.80</td>
+                            <td class="metric-value">0.68</td>
+                            <td><span class="badge badge-success">Good</span></td>
+                        </tr>
+                        <tr>
+                            <td>แก้ไขรอยแตกร้าวและเก็บสีให้เรียบร้อย</td>
+                            <td>11</td>
+                            <td class="metric-value">0.73</td>
+                            <td class="metric-value">0.81</td>
+                            <td><span class="badge badge-success">Good</span></td>
+                        </tr>
+                        <tr>
+                            <td>เก็บยาแนวกระเบื้องให้เรียบร้อย</td>
+                            <td>7</td>
+                            <td class="metric-value">0.71</td>
+                            <td class="metric-value">0.77</td>
+                            <td><span class="badge badge-success">Good</span></td>
+                        </tr>
+                        <tr>
+                            <td>ขัดแต่งฝ้าและเก็บสีให้เรียบร้อย</td>
+                            <td>6</td>
+                            <td class="metric-value">0.67</td>
+                            <td class="metric-value">0.76</td>
+                            <td><span class="badge badge-warning">Fair</span></td>
+                        </tr>
+                        <tr>
+                            <td>ติดตั้งนอตยึดบานพับให้เรียบร้อย</td>
+                            <td>3</td>
+                            <td class="metric-value">0.67</td>
+                            <td class="metric-value">0.71</td>
+                            <td><span class="badge badge-warning">Fair</span></td>
+                        </tr>
+                        <tr>
+                            <td>เก็บสีสันบานให้เรียบร้อย</td>
+                            <td>3</td>
+                            <td class="metric-value">0.67</td>
+                            <td class="metric-value">0.59</td>
+                            <td><span class="badge badge-warning">Fair</span></td>
+                        </tr>
+                        <tr>
+                            <td>ขัดแต่งผนังและเก็บสีให้เรียบร้อย</td>
+                            <td>7</td>
+                            <td class="metric-value">0.43</td>
+                            <td class="metric-value">0.56</td>
+                            <td><span class="badge badge-danger">Needs Improve</span></td>
+                        </tr>
+                        <tr>
+                            <td>เปลี่ยนนอตยึดบานพับพร้อมติดตั้งให้เรียบร้อย</td>
+                            <td>7</td>
+                            <td class="metric-value">0.00</td>
+                            <td class="metric-value">0.41</td>
+                            <td><span class="badge badge-danger">Fail</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+
+            <section>
+                <h2>🏗 System Architecture</h2>
+                <p>โครงสร้างระบบและเทคโนโลยีที่ใช้ในการพัฒนา Web Application (House Defect Captioning):</p>
+
+                <h3>1. Technology Stack</h3>
+                <ul>
+                    <li><strong>Frontend Framework:</strong> React 19 + TypeScript</li>
+                    <li><strong>Build Tool:</strong> Vite 6 (Fast Build & HMR)</li>
+                    <li><strong>Styling:</strong> Tailwind CSS 4.0</li>
+                    <li><strong>State Management:</strong> Zustand</li>
+                    <li><strong>Backend:</strong> Python FastAPI</li>
+                    <li><strong>Features:</strong> PWA Support (Mobile Installable), Camera Access</li>
+                </ul>
+
+                <h3>2. Layered Architecture</h3>
+                <p>การออกแบบระบบแบ่งเป็น Layer เพื่อความยืดหยุ่นและการดูแลรักษา (Separation of Concerns):</p>
+                <div
+                    style="background:#f8f9fa; padding:1rem; border-radius:8px; font-family:monospace; font-size:0.85rem; overflow-x:auto;">
+                    <pre style="margin:0;">
+UI [Components] ──► Hooks [Logic] ──► Service [API] ──► Mapper [Transform] ──► Store [State] ──► UI [Update]
+                </pre>
+                </div>
+
+                <table style="margin-top:1rem;">
+                    <thead>
+                        <tr>
+                            <th>Layer</th>
+                            <th>Path</th>
+                            <th>Responsibility</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>UI Components</strong></td>
+                            <td><code>src/components/</code></td>
+                            <td>ส่วนแสดงผล เน้นความสวยงาม (Presentational)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hooks</strong></td>
+                            <td><code>src/hooks/</code></td>
+                            <td>จัดการ Logic และเชื่อมต่อ UI กับข้อมูล (Business Logic)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Services</strong></td>
+                            <td><code>src/services/</code></td>
+                            <td>เชื่อมต่อกับ API ภายนอก หรือ AI Model</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mappers</strong></td>
+                            <td><code>src/lib/mappers/</code></td>
+                            <td>แปลงข้อมูล Raw Data ให้เป็น Format ที่พร้อมแสดงผล</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Store</strong></td>
+                            <td><code>src/lib/store.ts</code></td>
+                            <td>จัดการ State กลางของแอพด้วย Zustand</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>3. Image Analysis Workflow</h3>
+                <ol>
+                    <li><strong>User Upload:</strong> ผู้ใช้อัปโหลดภาพผ่าน <code>UploadZone.tsx</code></li>
+                    <li><strong>Analysis:</strong> <code>Dashboard.tsx</code> เรียกใช้ Hook เพื่อส่งภาพไปวิเคราะห์</li>
+                    <li><strong>API Call:</strong> Service ส่งภาพไปยัง Python Backend (Port 8000)</li>
+                    <li><strong>Inference:</strong> Backend รัน AI Model (ViT-GPT2) เพื่อสร้าง Caption</li>
+                    <li><strong>Mapping:</strong> Frontend ได้รับผลลัพธ์และแปลงข้อความ/ค่าความมั่นใจผ่าน Mapper</li>
+                    <li><strong>Update UI:</strong> Store อัปเดตข้อมูล และหน้าจอแสดงผลลัพธ์ทันที</li>
+                </ol>
+            </section>
+
+            <div class="footer">
+                <p>February 2026</p>
+            </div>
+    </div>
+
+</body>
+
+</html>

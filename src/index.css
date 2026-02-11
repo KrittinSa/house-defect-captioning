@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --color-crimson: #FF0000;
+  --color-crimson-dark: #B30000;
+  --color-crimson-light: #FF4D4D;
+
+  --color-gunmetal: #2D2D2D;
+  --color-gunmetal-dark: #1A1A1A;
+  --color-gunmetal-light: #404040;
+
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.1), 0 4px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 15px rgba(255, 0, 0, 0.3);
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --primary: 0 100% 50%;
+    --primary-foreground: 210 40% 98%;
+    /* Add more shadcn-like variables if needed */
+  }
+}
+
+body {
+  @apply bg-white text-slate-900;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.premium-card {
+  @apply bg-white rounded-3xl border border-slate-100 shadow-premium transition-all duration-300 hover:shadow-xl;
+}
