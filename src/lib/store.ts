@@ -94,14 +94,16 @@ export const useStore = create<AppState>()(
                 const state = get();
 
                 if (state.projects.length === 0) {
-                    // Auto-create default project if none exists
+                    // Auto-create default project only if DB is completely empty
                     await get().addProject('Default Project', 'Main Site');
-                } else if (state.currentProjectId) {
-                    // Refresh current project data
-                    await get().switchProject(state.currentProjectId);
                 } else {
-                    // Default to first project if none selected
-                    await get().switchProject(state.projects[0].id);
+                    // Check if saved projectId still exists in DB
+                    const savedExists = state.currentProjectId
+                        && state.projects.some(p => p.id === state.currentProjectId);
+                    const targetId = savedExists
+                        ? state.currentProjectId!
+                        : state.projects[0].id;
+                    await get().switchProject(targetId);
                 }
             },
 
