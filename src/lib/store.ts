@@ -92,9 +92,14 @@ export const useStore = create<AppState>()(
             initialize: async () => {
                 await get().fetchProjects();
                 const state = get();
-                if (state.currentProjectId) {
+
+                if (state.projects.length === 0) {
+                    // Auto-create default project if none exists
+                    await get().addProject('Default Project', 'Main Site');
+                } else if (state.currentProjectId) {
+                    // Refresh current project data
                     await get().switchProject(state.currentProjectId);
-                } else if (state.projects.length > 0) {
+                } else {
                     // Default to first project if none selected
                     await get().switchProject(state.projects[0].id);
                 }
