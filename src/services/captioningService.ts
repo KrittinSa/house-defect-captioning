@@ -3,7 +3,7 @@ import { CONFIG } from '../config';
 
 // 1. Define the Interface
 export interface ICaptioningProvider {
-    analyzeImage(imageFile: File): Promise<{ data: InferenceResponseDB | null; error: string | null }>;
+    analyzeImage(imageFile: File, projectId?: number): Promise<{ data: InferenceResponseDB | null; error: string | null }>;
 }
 
 // 2. Implement Mock Provider (Current Logic)
@@ -17,7 +17,7 @@ class MockProvider implements ICaptioningProvider {
         { label: 'mold_growth', confidence: 0.85 },
     ];
 
-    async analyzeImage(imageFile: File): Promise<{ data: InferenceResponseDB | null; error: string | null }> {
+    async analyzeImage(imageFile: File, projectId?: number): Promise<{ data: InferenceResponseDB | null; error: string | null }> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (!imageFile) {
@@ -33,10 +33,13 @@ class MockProvider implements ICaptioningProvider {
 
 // 3. Implement Local API Provider (Python Backend)
 class LocalApiProvider implements ICaptioningProvider {
-    async analyzeImage(imageFile: File): Promise<{ data: InferenceResponseDB | null; error: string | null }> {
+    async analyzeImage(imageFile: File, projectId?: number): Promise<{ data: InferenceResponseDB | null; error: string | null }> {
         try {
             const formData = new FormData();
             formData.append('file', imageFile);
+            if (projectId) {
+                formData.append('project_id', projectId.toString());
+            }
 
             const response = await fetch(`${CONFIG.apiUrl}/predict`, {
                 method: 'POST',
@@ -44,7 +47,8 @@ class LocalApiProvider implements ICaptioningProvider {
             });
 
             if (!response.ok) {
-                throw new Error(`API Error: ${response.statusText}`);
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || errorData.error || `API Error: ${response.statusText}`);
             }
 
             const data = await response.json();
@@ -63,8 +67,8 @@ const providers: Record<string, ICaptioningProvider> = {
 };
 
 export const captioningService = {
-    analyzeImage: async (imageFile: File) => {
+    analyzeImage: async (imageFile: File, projectId?: number) => {
         const provider = providers[CONFIG.inferenceProvider] || providers['mock'];
-        return provider.analyzeImage(imageFile);
+        return provider.analyzeImage(imageFile, projectId);
     }
 };

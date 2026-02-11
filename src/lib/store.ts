@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { DefectAnalysisUI, ProjectStats } from '../types/defect';
+import type { DefectAnalysisUI, ProjectStats, Project } from '../types/defect';
 import { defectService } from '../services/defectService';
+import { projectService } from '../services/projectService';
 import { defectMapper } from './mappers/defectMapper';
 
 export type AppView = 'home' | 'history' | 'report';
@@ -11,12 +12,21 @@ interface AppState {
     stats: ProjectStats;
     currentAnalysisId: string | null;
     currentView: AppView;
+    projects: Project[];
+    currentProjectId: number | null;
+
     addAnalysis: (analysis: DefectAnalysisUI) => void;
     updateAnalysis: (id: string, updates: Partial<DefectAnalysisUI>) => void;
     deleteAnalysis: (id: string) => void;
     setCurrentAnalysisId: (id: string | null) => void;
     setView: (view: AppView) => void;
+
+    // Project Actions
     initialize: () => Promise<void>;
+    fetchProjects: () => Promise<void>;
+    addProject: (name: string, address?: string) => Promise<void>;
+    switchProject: (projectId: number) => Promise<void>;
+    deleteProject: (projectId: number) => Promise<void>;
 }
 
 const calculateStats = (analyses: DefectAnalysisUI[]): ProjectStats => {
@@ -40,11 +50,13 @@ const initialStats: ProjectStats = {
 
 export const useStore = create<AppState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             analyses: [],
             stats: initialStats,
             currentAnalysisId: null,
             currentView: 'home',
+            projects: [],
+            currentProjectId: null,
 
             addAnalysis: (analysis: DefectAnalysisUI) => set((state: AppState) => {
                 const newAnalyses = [analysis, ...state.analyses];
@@ -52,6 +64,16 @@ export const useStore = create<AppState>()(
             }),
 
             updateAnalysis: (id: string, updates: Partial<DefectAnalysisUI>) => set((state: AppState) => {
+                // Map UI updates to Backend fields
+                const backendUpdates: any = {};
+                if (updates.labelThai !== undefined) backendUpdates.caption = updates.labelThai;
+                if (updates.room !== undefined) backendUpdates.room = updates.room;
+                if (updates.severity !== undefined) backendUpdates.severity = updates.severity;
+
+                if (Object.keys(backendUpdates).length > 0) {
+                    defectService.update(Number(id), backendUpdates).catch(err => console.error(err));
+                }
+
                 const newAnalyses = state.analyses.map((a: DefectAnalysisUI) => a.id === id ? { ...a, ...updates } : a);
                 return { analyses: newAnalyses, stats: calculateStats(newAnalyses) };
             }),
@@ -68,15 +90,64 @@ export const useStore = create<AppState>()(
             }),
 
             initialize: async () => {
-                const records = await defectService.getAll();
+                await get().fetchProjects();
+                const state = get();
+                if (state.currentProjectId) {
+                    await get().switchProject(state.currentProjectId);
+                } else if (state.projects.length > 0) {
+                    // Default to first project if none selected
+                    await get().switchProject(state.projects[0].id);
+                }
+            },
+
+            fetchProjects: async () => {
+                const projects = await projectService.getAll();
+                set({ projects });
+            },
+
+            addProject: async (name: string, address?: string) => {
+                const newProject = await projectService.create(name, address);
+                if (newProject) {
+                    set((state) => ({ projects: [...state.projects, newProject] }));
+                    await get().switchProject(newProject.id); // Auto-switch to new project
+                }
+            },
+
+            switchProject: async (projectId: number) => {
+                set({ currentProjectId: projectId, analyses: [] }); // Clear current view
+                const records = await defectService.getAll(projectId);
                 const analyses = records.map(defectMapper.fromBackend);
                 set({ analyses, stats: calculateStats(analyses) });
             },
+
+            deleteProject: async (projectId: number) => {
+                const success = await projectService.delete(projectId);
+                if (success) {
+                    set((state) => ({
+                        projects: state.projects.filter(p => p.id !== projectId)
+                    }));
+                    const state = get();
+                    // If we deleted the current project, switch to another one
+                    if (state.currentProjectId === projectId) {
+                        const nextProject = state.projects[0];
+                        if (nextProject) {
+                            await get().switchProject(nextProject.id);
+                        } else {
+                            set({ currentProjectId: null, analyses: [], stats: initialStats });
+                        }
+                    }
+                }
+            }
         }),
         {
             name: 'house-defect-storage-v2',
             storage: createJSONStorage(() => localStorage),
-            partialize: (state) => ({ analyses: state.analyses, stats: state.stats }), // Only persist data, not view state if not needed (optional)
+            partialize: (state) => ({
+                analyses: state.analyses,
+                stats: state.stats,
+                currentProjectId: state.currentProjectId
+                // Don't persist projects list, fetch fresh on init
+            }),
         }
     )
 );

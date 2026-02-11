@@ -47,6 +47,7 @@ export const defectMapper = {
             room: (record.room as any) || 'General',
             timestamp: new Date(record.timestamp),
             status: 'done',
+            severity: record.severity,
         };
     }
 };

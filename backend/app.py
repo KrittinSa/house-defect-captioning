@@ -15,7 +15,7 @@ import config
 from engine import ImageCaptioningEngine
 from pdf_generator import generate_defect_pdf
 from database import create_db_and_tables, get_session
-from models import DefectRecord
+from models import DefectRecord, Project
 
 # SQLModel
 from sqlmodel import Session, select
@@ -59,12 +59,51 @@ def status():
         "device": config.DEVICE
     }
 
+# --- Project CRUD ---
+
+@app.get("/projects", response_model=List[Project])
+def get_projects(session: Session = Depends(get_session)):
+    return session.exec(select(Project)).all()
+
+@app.post("/projects", response_model=Project)
+def create_project(project: Project, session: Session = Depends(get_session)):
+    session.add(project)
+    session.commit()
+    session.refresh(project)
+    return project
+
+@app.delete("/projects/{project_id}")
+def delete_project(project_id: int, session: Session = Depends(get_session)):
+    project = session.get(Project, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    # Optional: Delete associated defects or cascade?
+    # For now, defects might become orphaned or you can cascade delete
+    # Ideally should cascade delete defects first
+    statement = select(DefectRecord).where(DefectRecord.project_id == project_id)
+    defects = session.exec(statement).all()
+    for d in defects:
+        session.delete(d)
+        
+    session.delete(project)
+    session.commit()
+    return {"success": True, "message": "Project and its defects deleted"}
+
+# --- Defect Operations ---
+
 @app.post("/predict")
 async def predict(
+    project_id: int = Form(...), # Require project_id
     file: UploadFile = File(...),
     session: Session = Depends(get_session)
 ):
     try:
+        # Check project validity
+        project = session.get(Project, project_id)
+        if not project:
+             raise HTTPException(status_code=404, detail="Project not found")
+
         # Read image
         image_data = await file.read()
         image = Image.open(io.BytesIO(image_data)).convert("RGB")
@@ -81,9 +120,6 @@ async def predict(
         caption = engine.predict(image)
         
         # Create Database Record
-        # For a simplistic approach, label is mock or derived. 
-        # In real scenario, model might output label. 
-        # Here we just use a generic one or try to guess from caption if possible.
         label = "detected_defect" 
         confidence = 0.95
         
@@ -94,7 +130,8 @@ async def predict(
             confidence=confidence,
             image_path=f"uploads/{safe_filename}", # Relative to static mount
             room="General",
-            severity="Low"
+            severity="Low",
+            project_id=project_id
         )
         session.add(defect)
         session.commit()
@@ -108,15 +145,25 @@ async def predict(
             "label": defect.label,
             "confidence": defect.confidence,
             "image_url": f"/static/uploads/{safe_filename}",
-            "timestamp": defect.timestamp
+            "timestamp": defect.timestamp,
+            "project_id": defect.project_id
         }
     except Exception as e:
         print(f"❌ Prediction Error: {e}")
+        if isinstance(e, HTTPException):
+            raise e
         return {"success": False, "error": str(e)}
 
 @app.get("/defects", response_model=List[DefectRecord])
-def get_defects(session: Session = Depends(get_session)):
-    defects = session.exec(select(DefectRecord).order_by(DefectRecord.timestamp.desc())).all()
+def get_defects(
+    project_id: int = None, # Optional filter
+    session: Session = Depends(get_session)
+):
+    query = select(DefectRecord).order_by(DefectRecord.timestamp.desc())
+    if project_id:
+        query = query.where(DefectRecord.project_id == project_id)
+        
+    defects = session.exec(query).all()
     return defects
 
 @app.delete("/defects/{defect_id}")
@@ -134,6 +181,26 @@ def delete_defect(defect_id: int, session: Session = Depends(get_session)):
     session.delete(defect)
     session.commit()
     return {"success": True, "message": "Defect deleted"}
+
+@app.patch("/defects/{defect_id}", response_model=DefectRecord)
+def update_defect(
+    defect_id: int, 
+    updates: dict, 
+    session: Session = Depends(get_session)
+):
+    defect = session.get(DefectRecord, defect_id)
+    if not defect:
+        raise HTTPException(status_code=404, detail="Defect not found")
+    
+    # Update fields
+    for key, value in updates.items():
+        if hasattr(defect, key):
+            setattr(defect, key, value)
+    
+    session.add(defect)
+    session.commit()
+    session.refresh(defect)
+    return defect
 
 @app.post("/generate-report")
 async def generate_report(
@@ -182,6 +249,68 @@ async def generate_report(
 
     except Exception as e:
         print(f"❌ Report Generation Error: {e}")
+        return {"success": False, "error": str(e)}
+
+@app.post("/generate-report-db")
+async def generate_report_db(
+    defect_ids: List[int],
+    session: Session = Depends(get_session)
+):
+    try:
+        # Fetch defects from DB
+        statement = select(DefectRecord).where(DefectRecord.id.in_(defect_ids)).order_by(DefectRecord.timestamp.desc())
+        defects = session.exec(statement).all()
+        
+        if not defects:
+            raise HTTPException(status_code=404, detail="No defects found for the given IDs")
+
+        report_items = []
+        
+        for defect in defects:
+            # Construct full image path
+            # defect.image_path is like "uploads/xyz.jpg" relative to "outputs/"
+            if not defect.image_path:
+                continue
+                
+            full_path = os.path.join(config.BACKEND_DIR, "outputs", defect.image_path)
+            
+            if os.path.exists(full_path):
+                try:
+                    image = Image.open(full_path).convert("RGB")
+                    report_items.append({
+                        "image": image,
+                        "caption": defect.caption,
+                        "room": defect.room or "Unknown",
+                        "severity": defect.severity or "Low"
+                    })
+                except Exception as img_err:
+                    print(f"⚠️ Error loading image {full_path}: {img_err}")
+            else:
+                 print(f"⚠️ Image file missing: {full_path}")
+
+        if not report_items:
+             raise HTTPException(status_code=400, detail="Could not load any valid images for the report")
+
+        # Generate PDF
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_filename = f"DefectReport_Selected_{timestamp}.pdf"
+        output_path = os.path.join(config.BACKEND_DIR, "reports", output_filename)
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        
+        generate_defect_pdf(report_items, output_path)
+        
+        # Return as downloadable file
+        return FileResponse(
+            output_path, 
+            media_type="application/pdf", 
+            filename=output_filename
+        )
+
+    except Exception as e:
+        print(f"❌ DB Report Generation Error: {e}")
+        # If it's already an HTTPException, re-raise it
+        if isinstance(e, HTTPException):
+            raise e
         return {"success": False, "error": str(e)}
 
 if __name__ == "__main__":

@@ -25,6 +25,7 @@ const ModalContent: React.FC<ModalContentProps> = ({ analysis, onUpdate, onDelet
     const [isEditing, setIsEditing] = useState(false);
     const [editLabel, setEditLabel] = useState(analysis.labelThai);
     const [editRoom, setEditRoom] = useState<RoomType>(analysis.room);
+    const [editSeverity, setEditSeverity] = useState<string>(analysis.severity || 'Low');
 
     const handleDelete = () => {
         toast('Confirm Delete?', {
@@ -44,6 +45,7 @@ const ModalContent: React.FC<ModalContentProps> = ({ analysis, onUpdate, onDelet
         onUpdate(analysis.id, {
             labelThai: editLabel,
             room: editRoom,
+            severity: editSeverity,
         });
         setIsEditing(false);
         toast.success('Changes saved successfully');
@@ -66,27 +68,38 @@ const ModalContent: React.FC<ModalContentProps> = ({ analysis, onUpdate, onDelet
                 </button>
 
                 {!isEditing && (
-                    <div className="absolute top-4 left-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute top-4 left-4 flex gap-2 transition-all">
                         <button
                             onClick={() => setIsEditing(true)}
-                            className="p-2 bg-white/80 hover:bg-white backdrop-blur-md rounded-full text-slate-700 shadow-sm"
+                            className="p-2.5 bg-white/90 hover:bg-white backdrop-blur-md rounded-full text-slate-700 shadow-premium border border-white/50 transition-all active:scale-95"
                             title="Edit"
                         >
-                            <SquarePen size={18} />
+                            <SquarePen size={20} />
                         </button>
                         <button
                             onClick={handleDelete}
-                            className="p-2 bg-white/80 hover:bg-red-500 hover:text-white backdrop-blur-md rounded-full text-red-500 shadow-sm transition-colors"
+                            className="p-2.5 bg-white/90 hover:bg-red-500 hover:text-white backdrop-blur-md rounded-full text-red-500 shadow-premium border border-white/50 transition-all active:scale-95"
                             title="Delete"
                         >
-                            <Trash2 size={18} />
+                            <Trash2 size={20} />
                         </button>
                     </div>
                 )}
 
                 {!isEditing && (
-                    <div className="absolute bottom-4 left-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-slate-200 bg-white shadow-sm text-slate-500">
-                        {analysis.room}
+                    <div className="absolute bottom-4 left-4 flex gap-2">
+                        <div className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-slate-200 bg-white shadow-sm text-slate-500">
+                            {analysis.room}
+                        </div>
+                        {analysis.severity && (
+                            <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border shadow-sm ${analysis.severity === 'Low' ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                    : analysis.severity === 'Medium' ? 'bg-yellow-50 text-yellow-600 border-yellow-100'
+                                        : analysis.severity === 'High' ? 'bg-orange-50 text-orange-600 border-orange-100'
+                                            : 'bg-red-50 text-red-600 border-red-100'
+                                }`}>
+                                {analysis.severity}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
@@ -116,7 +129,30 @@ const ModalContent: React.FC<ModalContentProps> = ({ analysis, onUpdate, onDelet
                                 ))}
                             </select>
                         </div>
-                        <div className="flex justify-end gap-2 mt-2">
+
+                        {/* Severity Selector */}
+                        <div>
+                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wider">Severity Level</label>
+                            <div className="grid grid-cols-4 gap-2">
+                                {['Low', 'Medium', 'High', 'Critical'].map((level) => (
+                                    <button
+                                        key={level}
+                                        onClick={() => setEditSeverity(level)}
+                                        className={`py-2 rounded-lg text-xs font-bold transition-all border ${editSeverity === level
+                                            ? level === 'Low' ? 'bg-emerald-500 text-white border-emerald-500 shadow-md transform scale-105'
+                                                : level === 'Medium' ? 'bg-yellow-500 text-white border-yellow-500 shadow-md transform scale-105'
+                                                    : level === 'High' ? 'bg-orange-500 text-white border-orange-500 shadow-md transform scale-105'
+                                                        : 'bg-red-600 text-white border-red-600 shadow-md transform scale-105'
+                                            : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                                            }`}
+                                    >
+                                        {level}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-slate-100">
                             <button
                                 onClick={() => setIsEditing(false)}
                                 className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800"
@@ -133,11 +169,20 @@ const ModalContent: React.FC<ModalContentProps> = ({ analysis, onUpdate, onDelet
                     </div>
                 ) : (
                     <div className="flex justify-between items-start mb-6">
-                        <div>
-                            <h2 className="text-2xl font-bold text-slate-900">
-                                {analysis.labelThai}
-                            </h2>
-                            <p className="text-slate-500 font-medium text-sm">{analysis.labelEn}</p>
+                        <div className="flex-1">
+                            <div className="flex items-center gap-2 group/title">
+                                <h2 className="text-2xl font-bold text-slate-900 leading-tight">
+                                    {analysis.labelThai}
+                                </h2>
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="p-1.5 text-slate-300 hover:text-crimson transition-colors rounded-lg hover:bg-slate-100 sm:opacity-0 sm:group-hover/title:opacity-100"
+                                    title="Edit label"
+                                >
+                                    <SquarePen size={16} />
+                                </button>
+                            </div>
+                            <p className="text-slate-500 font-medium text-sm mt-0.5">{analysis.labelEn}</p>
                         </div>
                         <div className="text-right">
                             <div className="text-3xl font-bold text-slate-800">

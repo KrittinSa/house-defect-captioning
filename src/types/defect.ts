@@ -18,6 +18,7 @@ export interface DefectAnalysisUI {
     room: RoomType;
     timestamp: Date;
     status: 'processing' | 'done' | 'error';
+    severity?: string;
 }
 
 export interface ProjectStats {
@@ -36,4 +37,12 @@ export interface DefectRecordBackend {
     image_path: string;
     room?: string;
     severity?: string;
+    project_id?: number;
+}
+
+export interface Project {
+    id: number;
+    name: string;
+    address?: string;
+    created_at: string;
 }
