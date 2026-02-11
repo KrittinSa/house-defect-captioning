@@ -98,8 +98,8 @@ export const ProjectManager: React.FC<ProjectManagerProps> = ({ onClose }) => {
                                     key={project.id}
                                     onClick={() => handleSwitch(project.id)}
                                     className={`group flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${currentProjectId === project.id
-                                            ? 'bg-crimson/5 border-crimson/20'
-                                            : 'bg-white border-slate-100 hover:border-slate-300'
+                                        ? 'bg-crimson/5 border-crimson/20'
+                                        : 'bg-white border-slate-100 hover:border-slate-300'
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
@@ -126,7 +126,7 @@ export const ProjectManager: React.FC<ProjectManagerProps> = ({ onClose }) => {
                                     ) : (
                                         <button
                                             onClick={(e) => handleDelete(e, project.id)}
-                                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg sm:opacity-0 sm:group-hover:opacity-100 transition-all"
                                         >
                                             <Trash2 size={16} />
                                         </button>
