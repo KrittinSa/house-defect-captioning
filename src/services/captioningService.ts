@@ -17,6 +17,7 @@ class MockProvider implements ICaptioningProvider {
         { label: 'mold_growth', confidence: 0.85 },
     ];
 
+    // @ts-ignore
     async analyzeImage(imageFile: File, _projectId?: number): Promise<{ data: InferenceResponseDB | null; error: string | null }> {
         return new Promise((resolve) => {
             setTimeout(() => {
