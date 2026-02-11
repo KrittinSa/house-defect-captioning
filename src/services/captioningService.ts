@@ -1,5 +1,6 @@
 import type { InferenceResponseDB } from '../types/defect';
 import { CONFIG } from '../config';
+import { apiFetch } from './apiFetch';
 
 // 1. Define the Interface
 export interface ICaptioningProvider {
@@ -42,7 +43,7 @@ class LocalApiProvider implements ICaptioningProvider {
                 formData.append('project_id', projectId.toString());
             }
 
-            const response = await fetch(`${CONFIG.apiUrl}/predict`, {
+            const response = await apiFetch(`${CONFIG.apiUrl}/predict`, {
                 method: 'POST',
                 body: formData,
             });

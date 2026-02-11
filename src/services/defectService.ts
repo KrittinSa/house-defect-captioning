@@ -1,5 +1,6 @@
 import { CONFIG } from '../config';
 import type { DefectRecordBackend } from '../types/defect';
+import { apiFetch } from './apiFetch';
 
 export const defectService = {
     // Fetch all defects from the backend (optional filter by project)
@@ -9,7 +10,7 @@ export const defectService = {
                 ? `${CONFIG.apiUrl}/defects?project_id=${projectId}`
                 : `${CONFIG.apiUrl}/defects`;
 
-            const response = await fetch(url);
+            const response = await apiFetch(url);
             if (!response.ok) {
                 throw new Error('Failed to fetch defects');
             }
@@ -23,7 +24,7 @@ export const defectService = {
     // Delete a defect by ID
     delete: async (id: number): Promise<boolean> => {
         try {
-            const response = await fetch(`${CONFIG.apiUrl}/defects/${id}`, {
+            const response = await apiFetch(`${CONFIG.apiUrl}/defects/${id}`, {
                 method: 'DELETE',
             });
             return response.ok;
@@ -36,7 +37,7 @@ export const defectService = {
     // Update a defect's metadata
     update: async (id: number, updates: any): Promise<boolean> => {
         try {
-            const response = await fetch(`${CONFIG.apiUrl}/defects/${id}`, {
+            const response = await apiFetch(`${CONFIG.apiUrl}/defects/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -61,7 +62,7 @@ export const defectService = {
                 return false;
             }
 
-            const response = await fetch(`${CONFIG.apiUrl}/generate-report-db`, {
+            const response = await apiFetch(`${CONFIG.apiUrl}/generate-report-db`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
