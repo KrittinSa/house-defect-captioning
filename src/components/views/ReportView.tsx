@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStore } from '../../lib/store';
 import { StatCard } from '../StatCard';
+import { ProxiedImage } from '../ProxiedImage';
 import { Activity, ShieldAlert, CheckCircle, List } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -103,7 +104,7 @@ export const ReportView: React.FC = () => {
                                     }`}>
                                     {selectedIds.includes(defect.id) && <div className="w-2.5 h-2.5 rounded-sm bg-slate-900" />}
                                 </div>
-                                <img src={defect.imageUrl} alt={defect.labelEn} className="w-10 h-10 rounded-lg object-cover bg-slate-200" />
+                                <ProxiedImage src={defect.imageUrl} alt={defect.labelEn} className="w-10 h-10 rounded-lg object-cover bg-slate-200" />
                                 <div className="flex-1">
                                     <div className="font-bold text-sm line-clamp-1">{defect.labelThai}</div>
                                     <div className={`text-[10px] uppercase font-bold tracking-wider ${selectedIds.includes(defect.id) ? 'text-slate-400' : 'text-slate-400'

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { DefectAnalysisUI } from '../types/defect';
+import { ProxiedImage } from './ProxiedImage';
 // import { Clock } from 'lucide-react';
 
 interface DefectCardProps {
@@ -32,7 +33,7 @@ export const DefectCard: React.FC<DefectCardProps> = ({ data }) => {
             whileTap={{ scale: 0.99 }}
         >
             <div className="w-full sm:w-32 h-40 sm:h-full relative overflow-hidden bg-slate-100 shrink-0">
-                <img
+                <ProxiedImage
                     src={data.imageUrl}
                     alt={data.labelEn}
                     className="w-full h-full object-cover transition-all duration-700 hover:scale-110"

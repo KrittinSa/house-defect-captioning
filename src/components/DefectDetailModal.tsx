@@ -3,6 +3,7 @@ import { useStore } from '../lib/store';
 import { X, Calendar, Activity, AlertTriangle, SquarePen, Trash2, Save, Home } from 'lucide-react';
 import type { RoomType, DefectAnalysisUI } from '../types/defect';
 import { toast } from 'sonner';
+import { ProxiedImage } from './ProxiedImage';
 
 const ROOM_OPTIONS: RoomType[] = [
     'General',
@@ -55,7 +56,7 @@ const ModalContent: React.FC<ModalContentProps> = ({ analysis, onUpdate, onDelet
         <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
             {/* Header Image */}
             <div className="relative h-64 sm:h-80 bg-slate-100 group">
-                <img
+                <ProxiedImage
                     src={analysis.imageUrl}
                     alt={analysis.labelEn}
                     className="w-full h-full object-contain bg-black/5"
@@ -93,9 +94,9 @@ const ModalContent: React.FC<ModalContentProps> = ({ analysis, onUpdate, onDelet
                         </div>
                         {analysis.severity && (
                             <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border shadow-sm ${analysis.severity === 'Low' ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                                    : analysis.severity === 'Medium' ? 'bg-yellow-50 text-yellow-600 border-yellow-100'
-                                        : analysis.severity === 'High' ? 'bg-orange-50 text-orange-600 border-orange-100'
-                                            : 'bg-red-50 text-red-600 border-red-100'
+                                : analysis.severity === 'Medium' ? 'bg-yellow-50 text-yellow-600 border-yellow-100'
+                                    : analysis.severity === 'High' ? 'bg-orange-50 text-orange-600 border-orange-100'
+                                        : 'bg-red-50 text-red-600 border-red-100'
                                 }`}>
                                 {analysis.severity}
                             </div>
